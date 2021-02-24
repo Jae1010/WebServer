@@ -2,7 +2,6 @@
 	> File Name: log.cpp
 	> Author: 
 	> Mail: 
-	> Created Time: Tue 23 Feb 2021 09:44:25 PM PST
  ************************************************************************/
 
 #include <string.h>

@@ -2,7 +2,6 @@
 	> File Name: log.h
 	> Author: 
 	> Mail: 
-	> Created Time: Tue 23 Feb 2021 09:19:29 PM PST
  ************************************************************************/
 
 #ifndef _LOG_H
