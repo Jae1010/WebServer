@@ -1,25 +1,20 @@
-/*************************************************************************
-	> File Name: log.h
-	> Author: 
-	> Mail: 
- ************************************************************************/
-
-#ifndef _LOG_H
-#define _LOG_H
+#ifndef LOG_H
+#define LOG_H
 
 #include <stdio.h>
 #include <iostream>
 #include <string>
 #include <stdarg.h>
 #include <pthread.h>
-#include <sys/time.h>
-#include "./block_queue.h"
+#include "block_queue.h"
 
 using namespace std;
 
-class Log{
+class Log
+{
 public:
-    static Log* get_instance()
+    //C++11以后,使用局部变量懒汉不用加锁
+    static Log *get_instance()
     {
         static Log instance;
         return &instance;
@@ -29,29 +24,27 @@ public:
     {
         Log::get_instance()->async_write_log();
     }
-
+    //可选择的参数有日志文件、日志缓冲区大小、最大行数以及最长日志条队列
     bool init(const char *file_name, int close_log, int log_buf_size = 8192, int split_lines = 5000000, int max_queue_size = 0);
 
     void write_log(int level, const char *format, ...);
-    
+
     void flush(void);
 
 private:
     Log();
     virtual ~Log();
-
     void *async_write_log()
     {
         string single_log;
-
-        while(m_log_queue->pop(single_log))
+        //从阻塞队列中取出一个日志string，写入文件
+        while (m_log_queue->pop(single_log))
         {
             m_mutex.lock();
             fputs(single_log.c_str(), m_fp);
             m_mutex.unlock();
         }
     }
-
 
 private:
     char dir_name[128]; //路径名
@@ -72,7 +65,5 @@ private:
 #define LOG_INFO(format, ...) if(0 == m_close_log) {Log::get_instance()->write_log(1, format, ##__VA_ARGS__); Log::get_instance()->flush();}
 #define LOG_WARN(format, ...) if(0 == m_close_log) {Log::get_instance()->write_log(2, format, ##__VA_ARGS__); Log::get_instance()->flush();}
 #define LOG_ERROR(format, ...) if(0 == m_close_log) {Log::get_instance()->write_log(3, format, ##__VA_ARGS__); Log::get_instance()->flush();}
-
-
 
 #endif
