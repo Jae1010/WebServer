@@ -29,7 +29,6 @@ public:
               int thread_num, int close_log, int actor_model);
 
     void thread_pool();
-   // void sql_pool();
     void log_write();
     void trig_mode();
     void eventListen();
@@ -52,14 +51,7 @@ public:
 
     int m_pipefd[2];
     int m_epollfd;
-    http_conn *users;
-
-    //数据库相关
-  //  connection_pool *m_connPool;
-    string m_user;         //登陆数据库用户名
-    string m_passWord;     //登陆数据库密码
-    string m_databaseName; //使用数据库名
-    int m_sql_num;
+    http_conn *arr_http_conn;
 
     //线程池相关
     threadpool<http_conn> *m_pool;
@@ -75,7 +67,7 @@ public:
     int m_CONNTrigmode;
 
     //定时器相关
-    client_data *users_timer;
+    client_data *arr_client_data;
     Utils utils;
 };
 #endif

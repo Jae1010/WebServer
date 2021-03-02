@@ -110,8 +110,7 @@ void http_conn::close_conn(bool real_close)
 }
 
 //初始化连接,外部调用初始化套接字地址
-void http_conn::init(int sockfd, const sockaddr_in &addr, char *root, int TRIGMode,
-                     int close_log, string user, string passwd, string sqlname)
+void http_conn::init(int sockfd, const sockaddr_in &addr, char *root, int TRIGMode, int close_log)
 {
     m_sockfd = sockfd;
     m_address = addr;
@@ -123,10 +122,6 @@ void http_conn::init(int sockfd, const sockaddr_in &addr, char *root, int TRIGMo
     doc_root = root;
     m_TRIGMode = TRIGMode;
     m_close_log = close_log;
-
-    strcpy(sql_user, user.c_str());
-    strcpy(sql_passwd, passwd.c_str());
-    strcpy(sql_name, sqlname.c_str());
 
     init();
 }
@@ -151,8 +146,8 @@ void http_conn::init()
     m_write_idx = 0;
     cgi = 0;
     m_state = 0;
-    timer_flag = 0;
-    improv = 0;
+    read_write_or_not = 0;
+    read_write_flag = 0;
 
     memset(m_read_buf, '\0', READ_BUFFER_SIZE);
     memset(m_write_buf, '\0', WRITE_BUFFER_SIZE);

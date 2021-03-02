@@ -73,7 +73,7 @@ public:
     ~http_conn() {}
 
 public:
-    void init(int sockfd, const sockaddr_in &addr, char *, int, int, string user, string passwd, string sqlname);
+    void init(int sockfd, const sockaddr_in &addr, char *, int, int);
     void close_conn(bool real_close = true);
     void process();
     bool read_once();
@@ -82,9 +82,9 @@ public:
     {
         return &m_address;
     }
-   // void initmysql_result(connection_pool *connPool);
-    int timer_flag;
-    int improv;
+
+    int read_write_or_not; //是否执行了从sockfd连接读写数据操作
+    int read_write_flag; //读写数据操作是否成功
 
 
 private:

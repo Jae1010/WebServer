@@ -118,32 +118,30 @@ void threadpool<T>::run()
             {
                 if (request->read_once())
                 {
-                    request->improv = 1;
-                    //connectionRAII mysqlcon(&request->mysql, m_connPool);
+                    request->read_write_or_not = 1;
                     request->process();
                 }
                 else
                 {
-                    request->improv = 1;
-                    request->timer_flag = 1;
+                    request->read_write_or_not = 1;
+                    request->read_write_flag = 1;
                 }
             }
             else
             {
                 if (request->write())
                 {
-                    request->improv = 1;
+                    request->read_write_or_not = 1;
                 }
                 else
                 {
-                    request->improv = 1;
-                    request->timer_flag = 1;
+                    request->read_write_or_not = 1;
+                    request->read_write_flag = 1;
                 }
             }
         }
         else
         {
-            //connectionRAII mysqlcon(&request->mysql, m_connPool);
             request->process();
         }
     }
