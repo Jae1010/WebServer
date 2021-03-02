@@ -1,6 +1,5 @@
 #include "http_conn.h"
 
-//#include <mysql/mysql.h>
 #include <fstream>
 
 //定义http响应的一些状态信息
@@ -16,36 +15,6 @@ const char *error_500_form = "There was an unusual problem serving the request f
 
 locker m_lock;
 map<string, string> users;
-
-/*void http_conn::initmysql_result(connection_pool *connPool)
-{
-    //先从连接池中取一个连接
-    MYSQL *mysql = NULL;
-    connectionRAII mysqlcon(&mysql, connPool);
-
-    //在user表中检索username，passwd数据，浏览器端输入
-    if (mysql_query(mysql, "SELECT username,passwd FROM user"))
-    {
-        LOG_ERROR("SELECT error:%s\n", mysql_error(mysql));
-    }
-
-    //从表中检索完整的结果集
-    MYSQL_RES *result = mysql_store_result(mysql);
-
-    //返回结果集中的列数
-    int num_fields = mysql_num_fields(result);
-
-    //返回所有字段结构的数组
-    MYSQL_FIELD *fields = mysql_fetch_fields(result);
-
-    //从结果集中获取下一行，将对应的用户名和密码，存入map中
-    while (MYSQL_ROW row = mysql_fetch_row(result))
-    {
-        string temp1(row[0]);
-        string temp2(row[1]);
-        users[temp1] = temp2;
-    }
-}*/
 
 //对文件描述符设置非阻塞
 int setnonblocking(int fd)
@@ -130,7 +99,6 @@ void http_conn::init(int sockfd, const sockaddr_in &addr, char *root, int TRIGMo
 //check_state默认为分析请求行状态
 void http_conn::init()
 {
-//    mysql = NULL;
     bytes_to_send = 0;
     bytes_have_send = 0;
     m_check_state = CHECK_STATE_REQUESTLINE;
@@ -390,16 +358,6 @@ http_conn::HTTP_CODE http_conn::do_request()
     //处理cgi
     if (cgi == 1 && (*(p + 1) == '2' || *(p + 1) == '3'))
     {
-
-        //根据标志判断是登录检测还是注册检测
-        char flag = m_url[1];
-
-        char *m_url_real = (char *)malloc(sizeof(char) * 200);
-        strcpy(m_url_real, "/");
-        strcat(m_url_real, m_url + 2);
-        strncpy(m_real_file + len, m_url_real, FILENAME_LEN - len - 1);
-        free(m_url_real);
-
         //将用户名和密码提取出来
         //user=123&passwd=123
         char name[100], password[100];
@@ -415,20 +373,9 @@ http_conn::HTTP_CODE http_conn::do_request()
 
         if (*(p + 1) == '3')
         {
-            //如果是注册，先检测数据库中是否有重名的
-            //没有重名的，进行增加数据
-            char *sql_insert = (char *)malloc(sizeof(char) * 200);
-            strcpy(sql_insert, "INSERT INTO user(username, passwd) VALUES(");
-            strcat(sql_insert, "'");
-            strcat(sql_insert, name);
-            strcat(sql_insert, "', '");
-            strcat(sql_insert, password);
-            strcat(sql_insert, "')");
-
             if (users.find(name) == users.end())
             {
                 m_lock.lock();
-                //int res = mysql_query(mysql, sql_insert); //
                 std::pair< std::map< string,string >::iterator,bool > res;
                 res = users.insert(pair<string, string>(name, password));
                 m_lock.unlock();
@@ -703,6 +650,7 @@ bool http_conn::process_write(HTTP_CODE ret)
             if (!add_content(ok_string))
                 return false;
         }
+        break;
     }
     default:
         return false;

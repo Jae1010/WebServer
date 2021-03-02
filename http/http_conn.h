@@ -22,7 +22,6 @@
 #include <map>
 
 #include "../lock/locker.h"
-//#include "../CGImysql/sql_connection_pool.h"
 #include "../timer/lst_timer.h"
 #include "../log/log.h"
 
@@ -110,7 +109,6 @@ private:
 public:
     static int m_epollfd;
     static int m_user_count;
-   // MYSQL *mysql;
     int m_state;  //读为0, 写为1
 
 private:
@@ -148,10 +146,6 @@ private:
     map<string, string> m_users;
     int m_TRIGMode;
     int m_close_log;
-
-    char sql_user[100];
-    char sql_passwd[100];
-    char sql_name[100];
 };
 
 #endif
